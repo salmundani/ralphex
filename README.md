@@ -53,6 +53,10 @@ RRRRRRRR     RRRRRRR  aaaaaaaaaa  aaaallllllllp::::::pppppppp    hhhhhhh     hhh
 
 Ralphex is a Claude Code plugin that creates an automated development loop between two AI systems: **Claude Code** (planner + implementer) and **OpenAI Codex** (code reviewer). The loop repeats until Codex approves the code with LGTM.
 
+I usually prefer running a single agent model, but from my coding sessions, I feel that Claude is really good at planning and executing, while Codex really excels at code review.
+
+I was constantly doing the following loop manually, this plugin just automates it:
+
 ```
 Prompt → Plan → Implementation → Commit → Codex Review → Claude filters reviews → End
          ↑  ↓         ↑                                             ↓
