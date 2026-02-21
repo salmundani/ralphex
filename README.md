@@ -55,6 +55,30 @@ Ralphex is a Claude Code plugin that creates an automated development loop betwe
 
 I usually prefer running a single agent model, but from my coding sessions, I feel that Claude is really good at planning and executing, while Codex really excels at code review.
 
+## Installation
+
+### Prerequisites
+
+- [Claude Code](https://code.claude.com/docs)
+- [OpenAI Codex CLI](https://github.com/openai/codex) installed and authenticated
+
+### Install from marketplace
+
+```shell
+/plugin marketplace add salmundani/ralphex
+/plugin install ralphex@salmundani-ralphex
+```
+
+### Usage
+
+Once installed, run the skill from Claude Code:
+
+```shell
+/ralphex:ralphex <your task description>
+```
+
+## How it works
+
 I was constantly doing the following loop manually, this plugin just automates it:
 
 ```
