@@ -4,7 +4,7 @@
     "name": "Daniel Salmun"
   },
   "metadata": {
-    "description": "Claude Code plans and implements, Codex reviews. Repeat until clean."
+    "description": "Iterative dev loops powered by Claude Code and Codex code review."
   },
   "plugins": [
     {

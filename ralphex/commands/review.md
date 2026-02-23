@@ -50,10 +50,10 @@ Run Codex to review the branch changes:
 2. Run this exact command via Bash:
 
 ```
-codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "Review the changes of this branch against {review_target}. If you find issues, bugs, improvements, or corrections, describe each one clearly. If the code looks good and you have no corrections, respond ONLY with the exact text: LGTM" 2>/dev/null
+codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "Review the changes of this branch against {review_target}. {focus_instruction}If you find issues, bugs, improvements, or corrections, describe each one clearly. If the code looks good and you have no corrections, respond ONLY with the exact text: LGTM" 2>/dev/null
 ```
 
-Replace `{review_target}`, `{codex_model}`, and `{codex_reasoning_effort}` with the resolved values from Step 0.
+Replace `{review_target}`, `{codex_model}`, and `{codex_reasoning_effort}` with the resolved values from Step 0. Replace `{focus_instruction}` with `Pay special attention to: {$ARGUMENTS}. ` if the user provided arguments, or remove it entirely if no arguments were provided.
 
 3. **Check the exit code.** If the command exits with a non-zero status, inform the user that Codex failed (include the exit code) and stop. Do not attempt to read the review file.
 
@@ -91,7 +91,7 @@ Display your verdicts to the user in this format:
 ```
 
 Then decide:
-- If **all suggestions are rejected or deferred** → treat this as a clean review. Inform the user and stop.
+- If **all suggestions are rejected or deferred** → treat this as a clean review. Delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`. Inform the user and stop.
 - If **any suggestions are accepted** → delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`, then proceed to **Step 3: Implement** with the accepted corrections.
 
 ### If clean (LGTM):
