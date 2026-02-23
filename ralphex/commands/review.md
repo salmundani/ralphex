@@ -47,13 +47,21 @@ Run Codex to review the branch changes:
 
 1. Verify the working tree is clean with `git status`. If there are uncommitted changes, inform the user that uncommitted changes exist and they must be committed before running this command. Then stop.
 
-2. Run this exact command via Bash:
+2. Build the review prompt and run Codex:
+
+   a. First, construct the prompt text. Start with: `Review the changes of this branch against {review_target}.` If the user provided arguments (`$ARGUMENTS` is not empty), append: ` Pay special attention to: ` followed by the user's arguments and a period. Then append: ` If you find issues, bugs, improvements, or corrections, describe each one clearly. If the code looks good and you have no corrections, respond ONLY with the exact text: LGTM`
+
+   b. Write this prompt to a temporary file `.claude/ralphex-prompt.txt` using the Write tool (this avoids shell injection from user arguments).
+
+   c. Run this exact command via Bash:
 
 ```
-codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "Review the changes of this branch against {review_target}. {focus_instruction}If you find issues, bugs, improvements, or corrections, describe each one clearly. If the code looks good and you have no corrections, respond ONLY with the exact text: LGTM" 2>/dev/null
+codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "$(cat .claude/ralphex-prompt.txt)" 2>/dev/null
 ```
 
-Replace `{review_target}`, `{codex_model}`, and `{codex_reasoning_effort}` with the resolved values from Step 0. Replace `{focus_instruction}` with `Pay special attention to: {$ARGUMENTS}. ` if the user provided arguments, or remove it entirely if no arguments were provided.
+   d. Delete the temporary prompt file using Bash: `rm .claude/ralphex-prompt.txt`
+
+Replace `{codex_model}` and `{codex_reasoning_effort}` with the resolved values from Step 0.
 
 3. **Check the exit code.** If the command exits with a non-zero status, inform the user that Codex failed (include the exit code) and stop. Do not attempt to read the review file.
 
@@ -67,9 +75,9 @@ Determine if the review is clean or has corrections:
 
 1. Read the contents of `.claude/ralphex-review.txt`.
 2. The review is **an error** if:
-   - The file is empty or does not exist (this means Codex failed silently - treat as error, inform the user, and stop)
+   - The file is empty or does not exist (this means Codex failed silently - delete `.claude/ralphex-review.txt` if it exists using Bash: `rm -f .claude/ralphex-review.txt`, inform the user, and stop)
 3. The review is **clean** (no corrections needed) if:
-   - The file contains only "LGTM" (or very close variations)
+   - The file contains only "LGTM" with optional surrounding whitespace (strict match — do NOT treat "LGTM, except..." or "LGTM but..." as clean)
 4. The review **has corrections** if:
    - It contains specific issues, bugs, suggestions, or improvements
    - It describes code changes that should be made
