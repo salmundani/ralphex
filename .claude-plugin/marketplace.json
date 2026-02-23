@@ -10,8 +10,8 @@
     {
       "name": "ralphex",
       "source": "./ralphex",
-      "description": "Claude Code plans and implements, Codex reviews. Repeat until clean.",
-      "version": "0.1.0",
+      "description": "Iterative dev loops powered by Claude Code and Codex code review.",
+      "version": "0.2.0",
       "category": "development"
     }
   ]

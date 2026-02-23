@@ -1,8 +1,12 @@
 # ralphex
 
-Claude Code plans and implements, Codex reviews. Repeat until clean.
+Iterative dev loops powered by Claude Code and Codex code review.
 
-## How it works
+## Commands
+
+### `/ralphex:ralphex` — Implement & Review Loop
+
+Claude Code plans and implements, Codex reviews. Repeat until clean.
 
 1. You describe a coding task
 2. Claude Code plans and implements the solution
@@ -11,10 +15,24 @@ Claude Code plans and implements, Codex reviews. Repeat until clean.
 5. If Codex has corrections, Claude Code re-plans and re-implements
 6. Loop continues until Codex gives a clean review (LGTM)
 
-## Usage
+```
+/ralphex:ralphex Add a REST API endpoint for user registration with validation
+```
+
+### `/ralphex:review` — Review & Fix Loop
+
+Codex reviews existing code, Claude filters and fixes. Repeat until clean.
+
+1. Codex CLI reviews the branch diff against the base branch
+2. Claude Code filters the suggestions (accept, reject, or defer each one)
+3. Claude Code implements the accepted corrections
+4. Claude Code commits
+5. Codex reviews again
+6. Loop continues until Codex gives a clean review (LGTM)
 
 ```
-/ralphex Add a REST API endpoint for user registration with validation
+/ralphex:review
+/ralphex:review Focus on error handling and edge cases
 ```
 
 ## Setup
@@ -42,7 +60,7 @@ codex_reasoning_effort: high
 | `codex_model` | Codex model to use for reviews | *(required)* |
 | `codex_reasoning_effort` | Reasoning effort for reviews (`low`, `medium`, `high`, `xhigh`) | `high` |
 
-The command will prompt you for these values if the settings file doesn't exist.
+The commands will prompt you for these values if the settings file doesn't exist.
 
 ## Installation
 
