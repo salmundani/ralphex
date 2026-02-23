@@ -32,7 +32,9 @@ Execute an iterative review loop where Codex reviews your existing code, you (Cl
    - **Check for reasoning effort in model name**: If `codex_model` ends with `-low`, `-medium`, `-high`, or `-xhigh`, strip the suffix from `codex_model`, use it as `codex_reasoning_effort` (unless already set separately), and update the settings file.
    - `codex_reasoning_effort` must be one of: `low`, `medium`, `high`, `xhigh`. If it contains any other value, reject it and ask the user for a valid value. Default to `high` when not set.
 
-5. **Resolve the review target**: Run `git rev-parse --abbrev-ref HEAD` to get the current branch. Compute a `review_target` value:
+5. **Check for clean working tree**: Run `git status` and verify there are no uncommitted changes (staged or unstaged). If the working tree is dirty, inform the user that uncommitted changes exist and they must be committed before running this command. Then stop. This check must happen before the diff check so the user gets the correct message.
+
+6. **Resolve the review target**: Run `git rev-parse --abbrev-ref HEAD` to get the current branch. Compute a `review_target` value:
    - If the current branch is different from `base_branch`, set `review_target` = `base_branch`.
    - If the current branch equals `base_branch`, check if `origin/{base_branch}` exists by running `git rev-parse --verify origin/{base_branch}`. If it exists, set `review_target` = `origin/{base_branch}`. If it does not exist, inform the user that there is no remote to compare against and stop.
    - Verify there is actually a diff by running `git diff --stat {review_target}...HEAD`. If the diff is empty, inform the user there are no changes to review and stop.
@@ -45,9 +47,7 @@ Store `review_target`, `codex_model`, and `codex_reasoning_effort` for use throu
 
 Run Codex to review the branch changes:
 
-1. Verify the working tree is clean with `git status`. If there are uncommitted changes, inform the user that uncommitted changes exist and they must be committed before running this command. Then stop.
-
-2. Build the review prompt and run Codex:
+1. Build the review prompt and run Codex:
 
    a. First, construct the prompt text. Start with: `Review the changes of this branch against {review_target}.` If the user provided arguments (`$ARGUMENTS` is not empty), append: ` Pay special attention to: ` followed by the user's arguments and a period. Then append: ` If you find issues, bugs, improvements, or corrections, describe each one clearly. If the code looks good and you have no corrections, respond ONLY with the exact text: LGTM`
 
@@ -63,9 +63,9 @@ codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{code
 
 Replace `{codex_model}` and `{codex_reasoning_effort}` with the resolved values from Step 0.
 
-3. **Check the exit code.** If the command exits with a non-zero status, inform the user that Codex failed (include the exit code) and stop. Do not attempt to read the review file.
+2. **Check the exit code.** If the command exits with a non-zero status, clean up any stale review file using Bash: `rm -f .claude/ralphex-review.txt`. Then inform the user that Codex failed (include the exit code) and stop. Do not attempt to read the review file.
 
-4. Read the file `.claude/ralphex-review.txt` using the Read tool.
+3. Read the file `.claude/ralphex-review.txt` using the Read tool.
 
 ---
 
