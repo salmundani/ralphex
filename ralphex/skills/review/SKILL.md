@@ -12,8 +12,6 @@ compatibility: Designed for Claude Code. Expects an authenticated Codex CLI inst
 
 Execute an iterative review loop where Codex reviews your existing code, you (Claude Code) filter the suggestions and implement fixes, then Codex reviews again. Loop until there is no relevant corrections to implement in Codex's review.
 
-$ARGUMENTS
-
 ---
 
 ## Step 1: Read Settings
@@ -42,12 +40,11 @@ Store `review_target`, `codex_model`, and `codex_reasoning_effort` for use throu
 
 Run Codex to review the branch changes:
 
-1. Run this exact command via Bash:
+1. Run this command via Bash, replacing `{review_target}`, `{codex_model}`, and `{codex_reasoning_effort}` with the resolved values from Step 1, unless the user prompt "$ARGUMENTS" says otherwise:
    ```
-   codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "Review the committed changes of this branch against {review_target}." 2>/dev/null
+   codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "Review the committed changes of this branch against {review_target}. $ARGUMENTS" 2>/dev/null
    ```
 
-   Replace `{review_target}`, `{codex_model}`, and `{codex_reasoning_effort}` with the resolved values from Step 1.
 2. Check the exit code. If the command exits with a non-zero status, inform the user that Codex failed (include the exit code), then stop.
 
 ---
@@ -76,7 +73,7 @@ Display your verdicts to the user in this format:
 Then decide:
 
 - If **all suggestions are rejected or deferred** → treat this as a clean review. Inform the user and stop.
-- If **any suggestions are accepted** → delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`, then go back to **Step 2: Codex Code Review** with only the accepted corrections as context. Do not address rejected or deferred items.
+- If **any suggestions are accepted** → delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`, then proceed to **Step 4: Implement** with only the accepted corrections. Do not address rejected or deferred items.
 
 ### If clean
 

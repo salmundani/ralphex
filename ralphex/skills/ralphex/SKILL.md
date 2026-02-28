@@ -119,7 +119,7 @@ Display your verdicts to the user in this format:
 Then decide:
 
 - If **all suggestions are rejected or deferred** → treat this as a clean review. Inform the user and stop.
-- If **any suggestions are accepted** → delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`, then go back to **Step 1: Plan** with only the accepted corrections as context. Do not address rejected or deferred items.
+- If **any suggestions are accepted** → delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`, then go back to **Step 2: Plan** with only the accepted corrections as context. Do not address rejected or deferred items.
 
 ### If clean
 
