@@ -26,7 +26,11 @@ Execute an iterative review loop where Codex reviews your existing code, you (Cl
    - What Codex model to use (`gpt-5.3-codex`, `gpt-5.2-codex`, `gpt-5.3-codex-spark`)
    - What reasoning effort to use for reviews (suggest `high`; valid values: `low`, `medium`, `high`, `xhigh`)
    Then create `.claude/ralphex.local.md` with their answers.\
-4. Verify the working tree is clean with `git status`. If there are uncommitted changes, inform the user that uncommitted changes exist and they must be committed before running this command, then stop.
+4. Check for uncommitted changes by running `git status`. If there are uncommitted changes, use `AskUserQuestion` to present these options:
+   a. Commit modified tracked files: Run `git add -u` to stage all modified tracked files. Ask the user for a commit message, then commit with that message.
+   b. Commit all changes (modified + untracked): Run `git add -A` to stage everything including untracked files. Ask the user for a commit message, then commit with that message.
+   c. Stash changes: Generate a unique stash name by running `date +%s` and using `"ralphex-review-stash-{timestamp}"`. Run `git stash push -m "ralphex-review-stash-{timestamp}"`. Store the full stash message for later cleanup.
+   d. Cancel: Stop the review.
 5. Resolve the review target: Run `git rev-parse --abbrev-ref HEAD` to get the current branch. Compute a `review_target` value:
    - If the current branch is different from `base_branch`, set `review_target` = `base_branch`.
    - If the current branch equals `base_branch`, check if `origin/{base_branch}` exists by running `git rev-parse --verify origin/{base_branch}`. If it exists, set `review_target` = `origin/{base_branch}`. If it does not exist, inform the user that there is no remote to compare against and stop.
@@ -45,7 +49,7 @@ Run Codex to review the branch changes:
    codex exec --sandbox read-only -m {codex_model} -c model_reasoning_effort="{codex_reasoning_effort}" -o .claude/ralphex-review.txt "Review the committed changes of this branch against {review_target}. $ARGUMENTS" 2>/dev/null
    ```
 
-2. Check the exit code. If the command exits with a non-zero status, inform the user that Codex failed (include the exit code), then stop.
+2. Check the exit code. If the command exits with a non-zero status, inform the user that Codex failed (include the exit code). Perform **Cleanup: Restore Stashed Changes** if a stash was created in Step 1, then stop.
 
 ---
 
@@ -72,7 +76,7 @@ Display your verdicts to the user in this format:
 
 Then decide:
 
-- If **all suggestions are rejected or deferred** → treat this as a clean review. Inform the user and stop.
+- If **all suggestions are rejected or deferred** → treat this as a clean review. Inform the user. Perform **Cleanup: Restore Stashed Changes** if a stash was created in Step 1, then stop.
 - If **any suggestions are accepted** → delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`, then proceed to **Step 4: Implement** with only the accepted corrections. Do not address rejected or deferred items.
 
 ### If clean
@@ -80,6 +84,7 @@ Then decide:
 - Inform the user that Codex approved the implementation
 - Display the total number of iterations it took
 - Delete `.claude/ralphex-review.txt` using Bash: `rm .claude/ralphex-review.txt`
+- Perform **Cleanup: Restore Stashed Changes** if a stash was created in Step 1.
 
 ---
 
@@ -105,11 +110,23 @@ After committing, go back to **Step 2: Codex Code Review** for the next iteratio
 
 ---
 
+## Cleanup: Restore Stashed Changes
+
+If a stash was created in Step 1, restore it before stopping:
+
+1. Run `git stash list` and find the entry whose message contains the stash name stored in Step 1 (e.g., `"ralphex-review-stash-{timestamp}"`).
+2. Extract its `stash@{N}` reference from the matching line.
+3. Run `git stash pop stash@{N}`.
+4. If the pop fails due to conflicts, inform the user that the stash could not be applied cleanly and tell them to resolve conflicts and run `git stash pop` manually.
+
+---
+
 ## Important Rules
 
 - **Never skip the commit step.** Codex reviews committed diffs.
 - **Track iteration count.** Display it with each review cycle so the user knows progress.
 - **The loop is fully automatic.** No user approval is needed between iterations. Only stop when Codex gives a clean review, or all suggestions are rejected/deferred.
 - **If Codex CLI fails** (command not found, network error, etc.), inform the user and stop. Do not retry automatically.
-- **The workspace must be clean before the first review.** This command reviews existing committed code. Uncommitted changes are not visible to Codex.
+- **The workspace must be clean before the first review.** Codex reviews committed diffs. If there are uncommitted changes, offer to commit them, stash them, or cancel.
+- **If changes were stashed, always restore them.** Every exit path must perform the **Cleanup: Restore Stashed Changes** step before stopping.
 - **Clean up** `.claude/ralphex-review.txt` after reading it in every iteration, whether the review is clean or not.
