@@ -1,5 +1,5 @@
 ---
-name: review
+name: ralphex-review
 description: Codex reviews, Claude filters and fixes, repeat until clean
 argument-hint: Optionally describe what to focus the review on
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, AskUserQuestion
