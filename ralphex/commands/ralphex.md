@@ -1,7 +1,7 @@
 ---
 description: Iterative dev loop - Claude Code implements, Codex reviews, repeat until clean
 argument-hint: Describe the coding task to implement
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion"]
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "EnterPlanMode", "ExitPlanMode"]
 ---
 
 # Ralphex: Iterative Development with Codex Code Review
@@ -45,47 +45,14 @@ Store `review_target`, `codex_model`, and `codex_reasoning_effort` for use throu
 
 This step has two modes depending on whether this is the first iteration or a subsequent one.
 
-### First iteration — Structured Planning
+### First iteration — Plan Mode
 
-On the first iteration, go through all four phases before proceeding to implementation.
+On the first iteration, use Claude Code's native plan mode to explore, design, and get user approval before implementing.
 
-**Phase 1: Initial Understanding**
-
-Explore the codebase to understand the user's request in context:
-
-1. Use Glob to find relevant files and understand the project structure.
-2. Use Grep to search for existing patterns, utilities, and functions related to the task.
-3. Use Read to examine the most relevant files in detail.
-4. Build a mental model of how the existing code works and where the task fits in.
-5. If the user's requirements are unclear or ambiguous, ask clarifying questions via AskUserQuestion before proceeding.
-
-**Phase 2: Design**
-
-Based on Phase 1 findings, design a concrete implementation approach:
-
-1. Identify which files need to be created or modified.
-2. Determine what existing patterns, utilities, and conventions to follow.
-3. Note any existing code that can be reused.
-4. Keep the design focused on the minimum changes needed to accomplish the task.
-
-**Phase 3: Review**
-
-Review your own design for soundness:
-
-1. Check that the approach aligns with the user's task description.
-2. Verify you haven't overlooked relevant existing code or patterns.
-3. If you have remaining uncertainties or see multiple valid approaches, ask the user via AskUserQuestion.
-
-**Phase 4: Final Plan**
-
-Present the implementation plan to the user for approval:
-
-1. Summarize the recommended approach.
-2. List the files to be modified or created.
-3. Mention existing utilities or patterns you will reuse.
-4. Describe how the changes can be verified.
-5. **Ask the user for approval before proceeding to implementation.** Use AskUserQuestion with options like "Approve plan", "Request changes", etc.
-6. If the user requests changes, revise the plan and re-present it. Do not proceed until the user approves.
+1. **Call `EnterPlanMode`** to transition into read-only plan mode.
+2. **Create a plan**.
+3. **Call `ExitPlanMode`** to present the plan to the user for approval.
+4. If the user rejects or requests changes, revise the plan and call `ExitPlanMode` again. Do not proceed until approved.
 
 ### Subsequent iterations — Lightweight Re-plan
 
@@ -93,8 +60,7 @@ On subsequent iterations (after a Codex review with accepted corrections):
 
 1. Incorporate only the accepted Codex corrections into a targeted re-plan.
 2. Avoid full re-exploration, but do focused exploration (Read, Grep, Glob) when accepted corrections reference files or code paths not inspected in the first iteration.
-3. No user approval is needed — proceed immediately to implementation.
-4. Present the re-plan briefly to the user (just show what you will fix and proceed).
+3. No user approval is needed, proceed immediately to implementation.
 
 ---
 
@@ -186,7 +152,8 @@ Then decide:
 - **Never skip the commit step.** Codex reviews the committed diff, so the workspace must be clean.
 - **Let Codex review against the base branch.** It will determine the diff itself.
 - **Track iteration count.** Display it with each review cycle so the user knows progress.
-- **The initial plan requires user approval.** Do not begin implementation until the user approves the plan from Step 1, Phase 4.
+- **The initial plan requires user approval.** Do not begin implementation until the user approves the plan via `ExitPlanMode`.
+- **Plan mode is only for the first iteration.** Do not call `EnterPlanMode` on subsequent iterations. The lightweight re-plan runs inline without plan mode.
 - **Do NOT ask for user approval** between subsequent iterations. After the first implementation cycle, the loop is automatic. Only stop when Codex gives LGTM.
 - **If Codex CLI fails** (command not found, network error, etc.), inform the user and stop. Do not retry automatically.
 - **Clean up** `.claude/ralphex-review.txt` after reading it in every iteration, whether the review is clean or not.
