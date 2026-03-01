@@ -2,10 +2,7 @@
 name: ralphex-review
 description: Codex reviews, Claude filters and fixes, repeat until clean
 argument-hint: Optionally describe what to focus the review on
-allowed-tools: Read, Grep, Glob, Write, Edit, Bash, AskUserQuestion
 disable-model-invocation: true
-license: MIT
-compatibility: Designed for Claude Code. Expects an authenticated Codex CLI installation.
 ---
 
 # Ralphex Review: Iterative Code Review with Codex

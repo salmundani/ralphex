@@ -2,10 +2,7 @@
 name: ralphex
 description: Claude implements, Codex reviews, repeat until clean
 argument-hint: Describe the coding task to implement
-allowed-tools: Read, Grep, Glob, Write, Edit, Bash, AskUserQuestion, EnterPlanMode, ExitPlanMode
 disable-model-invocation: true
-license: MIT
-compatibility: Designed for Claude Code. Expects an authenticated Codex CLI installation.
 ---
 
 # Ralphex: Iterative Development with Codex Code Review
