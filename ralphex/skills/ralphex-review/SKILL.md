@@ -3,6 +3,7 @@ name: ralphex-review
 description: Codex reviews, Claude filters and fixes, repeat until clean
 argument-hint: Optionally describe what to focus the review on
 disable-model-invocation: true
+allowed-tools: Bash(*)
 ---
 
 # Ralphex Review: Iterative Code Review with Codex

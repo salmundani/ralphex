@@ -2,6 +2,7 @@
 name: ralphex-settings
 description: View or change ralphex settings (base_branch, codex_model, codex_reasoning_effort)
 disable-model-invocation: true
+allowed-tools: Bash(*)
 ---
 
 # Ralphex Settings

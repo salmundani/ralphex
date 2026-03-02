@@ -3,6 +3,7 @@ name: ralphex
 description: Claude implements, Codex reviews, repeat until clean
 argument-hint: Describe the coding task to implement
 disable-model-invocation: true
+allowed-tools: Bash(*)
 ---
 
 # Ralphex: Iterative Development with Codex Code Review
@@ -43,7 +44,7 @@ This step has two modes depending on whether this is the first iteration or a su
 On the first iteration, use Claude Code's native plan mode to explore, design, and get user approval before implementing.
 
 1. Call `EnterPlanMode` to transition into read-only plan mode.
-2. Create a plan.
+2. Create a plan. If the user prompt was vague or incomplete, ask clarifying questions by using AskUserQuestion.
 3. Call `ExitPlanMode` to present the plan to the user for approval.
 4. If the user rejects or requests changes, revise the plan and call `ExitPlanMode` again. Do not proceed until approved.
 
