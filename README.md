@@ -74,13 +74,19 @@ I usually prefer running a single agent model, but from my coding sessions, I fe
 Once installed, run the skill from Claude Code:
 
 ```shell
-/ralphex:ralphex
+/ralphex
 ```
 
 Or for just code review:
 
 ```shell
-/ralphex:review
+/ralphex-review
+```
+
+To configure settings like the base branch, Codex model, or reasoning effort:
+
+```shell
+/ralphex-settings
 ```
 
 ## How it works
@@ -88,13 +94,17 @@ Or for just code review:
 I was constantly doing the following loops manually, this plugin just automates them:
 
 ```shell
-$ /ralphex:ralphex
+$ /ralphex
 
 Prompt → Plan → Implementation → Commit → Codex Review → Claude filters reviews → End
          ↑  ↓         ↑                                             ↓
          └──┘         └────── loop if there are corrections ────────┘
+```
 
-$ /ralphex:review
+Sometimes I prefer to do the plan mode outside of the loop, and just do the code review loop at the end:
+
+```shell
+$ /ralphex-review
 
 Prompt → Codex Review → Claude filters reviews → Implementation → Commit → End
                                   ↓                                         ↑ 
@@ -108,3 +118,9 @@ Codex reviews have a high chance of false positives. Therefore, there is a step 
 - ✅ **Accept**: Real bugs, security issues, correctness problems.
 - ❌ **Reject**: Factually wrong suggestions, misunderstandings, or purely stylistic nitpicks.
 - ⏭️ **Defer**: Valid observations that are out of scope for the current task (e.g. pre-existing issues).
+
+### Caveats
+
+**IMPORTANT:** If you clear the context when accepting the plan in `/ralphex`'s Plan Mode, Claude will NOT do the commit → review → implement cycle at the end. To avoid this, you can accept the plan without clearing the context.
+
+Eventually I will have to do a more robust solution using stop hooks.
