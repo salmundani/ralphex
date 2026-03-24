@@ -21,7 +21,7 @@ Execute an iterative review loop where Codex reviews your existing code, you (Cl
    - `codex_reasoning_effort`: Reasoning effort for Codex reviews (default: `high`)
 3. If the file does not exist, first run `command -v codex` via Bash. If the command exits with a non-zero status (codex not found), inform the user: "Codex CLI is not installed. Install it from https://github.com/openai/codex and try again." and stop. Otherwise, ask the user:
    - What base branch to diff against (suggest `main`)
-   - What Codex model to use (`gpt-5.3-codex`, `gpt-5.2-codex`, `gpt-5.3-codex-spark`)
+   - What Codex model to use (`gpt-5.4`, `gpt-5.3-codex-spark`, `gpt-5.3-codex`)
    - What reasoning effort to use for reviews (suggest `high`; valid values: `low`, `medium`, `high`, `xhigh`)
    Then create `.claude/ralphex.local.md` with their answers.\
 4. Check for uncommitted changes by running `git status`. If there are uncommitted changes, use `AskUserQuestion` to present these options:
