@@ -25,7 +25,7 @@ Manage the ralphex configuration stored in `.claude/ralphex.local.md`.
 3. Ask the user which settings they want to change using AskUserQuestion.
 4. For each selected setting, ask for the new value using AskUserQuestion:
    - For `base_branch`: suggest the current value plus `main`, `master`, `develop` as options.
-   - For `codex_model`: suggest `gpt-5.4`, `gpt-5.3-codex-spark`, `gpt-5.3-codex` as options.
+   - For `codex_model`: suggest `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.5` as options.
    - For `codex_reasoning_effort`: offer `low`, `medium`, `high`, `xhigh` as options with `high` first.
 5. Write the updated settings to `.claude/ralphex.local.md` with YAML frontmatter:
 
