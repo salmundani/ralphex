@@ -118,9 +118,3 @@ Codex reviews have a high chance of false positives. Therefore, there is a step 
 - ✅ **Accept**: Real bugs, security issues, correctness problems.
 - ❌ **Reject**: Factually wrong suggestions, misunderstandings, or purely stylistic nitpicks.
 - ⏭️ **Defer**: Valid observations that are out of scope for the current task (e.g. pre-existing issues).
-
-### Caveats
-
-**IMPORTANT:** If you clear the context when accepting the plan in `/ralphex`'s Plan Mode, Claude will NOT do the commit → review → implement cycle at the end. To avoid this, you can accept the plan without clearing the context.
-
-Eventually I will have to do a more robust solution using stop hooks.
